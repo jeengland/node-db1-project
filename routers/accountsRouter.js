@@ -7,7 +7,23 @@ const db = require('../data/dbConfig');
 const router = express.Router();
 
 router.get('/', (req, res) => {
+    const { limit, sortby, sortdir } = req.query;
     db('accounts')
+        .modify((queryBuilder) => {
+            if (limit) {
+                queryBuilder.limit(limit)
+            }
+            if (sortdir) {
+                if (sortby) {
+                    queryBuilder.orderBy(sortby, sortdir)
+                } else {
+                    queryBuilder.orderBy('id', sortdir)
+                }
+            }
+            if (sortby) {
+                queryBuilder.orderBy(sortby)
+            }
+        })
         .then((accounts) => {
             res.status(200).json({ data: accounts })
         })
